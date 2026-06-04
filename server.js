@@ -1,5 +1,4 @@
 const express = require('express');
-const cors = require('@fastify/cors');
 const axios = require('axios');
 const { XMLParser } = require('fast-xml-parser');
 
@@ -15,6 +14,15 @@ function extractAssetId(input) {
   const match = text.match(/(?:asset|library|catalog)\/(\d+)|[?&]id=(\d+)|^\d+$/i);
   if (!match) return null;
   return match[1] || match[2] || text;
+}
+
+function buildCookieHeader() {
+  const raw = String(ROBLOSECURITY || '').trim();
+  if (!raw) return null;
+
+  // Aceita tanto o valor puro do cookie quanto ".ROBLOSECURITY=valor".
+  if (raw.includes('.ROBLOSECURITY=')) return raw;
+  return `.ROBLOSECURITY=${raw}`;
 }
 
 function robloxIdFromValue(value) {
@@ -50,7 +58,7 @@ const assetProps = new Set([
 function collectProps(props) {
   const found = [];
   if (!props || typeof props !== 'object') return found;
-  for (const [type, raw] of Object.entries(props)) {
+  for (const raw of Object.values(props)) {
     for (const prop of normalizeArray(raw)) {
       if (!prop || typeof prop !== 'object') continue;
       const propName = prop['@_name'];
@@ -104,7 +112,8 @@ async function getThumbnails(ids) {
 
 async function downloadAsset(assetId) {
   const headers = { 'User-Agent': 'RobloxAssetScanner/1.0' };
-  if (ROBLOSECURITY) headers.Cookie = `.ROBLOSECURITY=${ROBLOSECURITY}`;
+  const cookie = buildCookieHeader();
+  if (cookie) headers.Cookie = cookie;
 
   const urls = [
     `https://assetdelivery.roblox.com/v1/asset?id=${assetId}`,
@@ -172,7 +181,7 @@ app.get('/api/scan', async (req, res) => {
   } catch (err) {
     res.status(422).json({
       error: err.message,
-      help: 'Se aparecer RBXM binário, este MVP ainda precisa de parser binário. Se aparecer 401/403, configure ROBLOSECURITY no Railway ou teste outro asset público.'
+      help: 'Se aparecer RBXM binário, este MVP ainda precisa de parser binário. Se aparecer 401/403, confira se ROBLOSECURITY está certo no Railway e faça redeploy.'
     });
   }
 });
