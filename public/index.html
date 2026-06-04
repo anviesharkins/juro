@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Juro - Roblox Pack Scanner</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <p class="tag">Roblox Pack Scanner</p>
+      <h1>Juro</h1>
+      <p>Cole o link ou ID de um modelo da Creator Store para listar o Explorer e todos os IDs usados dentro dele.</p>
+      <form id="scanForm">
+        <input id="assetInput" placeholder="https://create.roblox.com/store/asset/1234567890/..." autocomplete="off" />
+        <button type="submit">Escanear</button>
+      </form>
+      <p class="hint">Ele procura MeshId, Texture, SoundId, AnimationId, Image e outras referências de asset.</p>
+    </section>
+
+    <section id="status" class="status hidden"></section>
+    <section id="summary" class="summary hidden"></section>
+    <section id="results" class="results hidden"></section>
+  </main>
+
+  <script src="/script.js"></script>
+</body>
+</html>
